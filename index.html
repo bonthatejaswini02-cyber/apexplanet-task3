@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UserVault — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --card: #1a1a26;
+      --border: #2a2a3d;
+      --accent: #6c63ff;
+      --accent2: #ff6b9d;
+      --green: #00d4aa;
+      --text: #e8e8f0;
+      --muted: #6b6b8a;
+      --danger: #ff4d6d;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .bg-orbs {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    }
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15;
+      animation: drift 8s ease-in-out infinite alternate;
+    }
+    .orb1 { width: 500px; height: 500px; background: var(--accent); top: -100px; left: -100px; }
+    .orb2 { width: 400px; height: 400px; background: var(--accent2); bottom: -80px; right: -80px; animation-delay: -3s; }
+    .orb3 { width: 300px; height: 300px; background: var(--green); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -5s; }
+    @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,20px) scale(1.05); } }
+    .container {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      width: 900px; min-height: 560px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+    }
+    .left-panel {
+      background: linear-gradient(135deg, #1a1a3e 0%, #0d0d1f 100%);
+      padding: 60px 50px;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .left-panel::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236c63ff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .brand { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
+    .brand span { color: var(--accent); }
+    .tagline { color: var(--muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 40px; }
+    .features { display: flex; flex-direction: column; gap: 16px; }
+    .feat {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(108,99,255,0.08); border: 1px solid rgba(108,99,255,0.15);
+      padding: 14px 18px; border-radius: 12px;
+    }
+    .feat-icon { font-size: 1.3rem; }
+    .feat-text { font-size: 0.85rem; color: #c0c0d8; }
+    .right-panel { padding: 60px 50px; display: flex; flex-direction: column; justify-content: center; }
+    h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 36px; }
+    .tabs { display: flex; gap: 0; margin-bottom: 32px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .tab {
+      flex: 1; padding: 10px; text-align: center; cursor: pointer;
+      font-size: 0.875rem; font-weight: 500; color: var(--muted);
+      background: var(--surface); transition: all 0.2s;
+    }
+    .tab.active { background: var(--accent); color: #fff; }
+    .form-panel { display: none; }
+    .form-panel.active { display: flex; flex-direction: column; gap: 16px; }
+    .field label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .field input, .field select {
+      width: 100%; padding: 12px 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-family: inherit; font-size: 0.9rem;
+      transition: border 0.2s, box-shadow 0.2s; outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,0.15); }
+    .field.inline { display: flex; gap: 10px; }
+    .field.inline > div { flex: 1; }
+    .btn {
+      padding: 14px; border-radius: 10px; border: none; cursor: pointer;
+      font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
+      transition: all 0.2s; letter-spacing: 0.02em;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #5a52e8; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(108,99,255,0.4); }
+    .error-msg { color: var(--danger); font-size: 0.8rem; display: none; padding: 10px; background: rgba(255,77,109,0.1); border-radius: 8px; border: 1px solid rgba(255,77,109,0.2); }
+    .toggle-pw { position: relative; }
+    .toggle-pw input { padding-right: 44px; }
+    .eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1.1rem; }
+    @media (max-width: 700px) {
+      .container { grid-template-columns: 1fr; width: 95%; }
+      .left-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<div class="container">
+  <div class="left-panel">
+    <div class="brand">User<span>Vault</span></div>
+    <p class="tagline">A complete PHP & MySQL User Management System built for ApexPlanet Task 3.</p>
+    <div class="features">
+      <div class="feat"><span class="feat-icon">🔐</span><span class="feat-text">Hashed passwords with password_hash()</span></div>
+      <div class="feat"><span class="feat-icon">🛡️</span><span class="feat-text">SQL Injection prevention with Prepared Statements</span></div>
+      <div class="feat"><span class="feat-icon">👥</span><span class="feat-text">Role-Based Access: Admin & User</span></div>
+      <div class="feat"><span class="feat-icon">📋</span><span class="feat-text">Full CRUD Operations on users</span></div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <h2>Welcome back</h2>
+    <p class="subtitle">Sign in to continue or create a new account</p>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab" onclick="switchTab('register')">Register</div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="form-panel active" id="login-form">
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="toggle-pw">
+          <input type="password" id="login-pw" placeholder="••••••••"/>
+          <button class="eye-btn" onclick="togglePw('login-pw',this)">👁</button>
+        </div>
+      </div>
+      <div class="error-msg" id="login-error">Invalid email or password. Try: admin@test.com / admin123</div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign In →</button>
+      <p style="font-size:0.78rem;color:var(--muted);text-align:center;">Demo: admin@test.com / admin123 &nbsp;|&nbsp; user@test.com / user123</p>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="form-panel" id="register-form">
+      <div class="field inline">
+        <div>
+          <label>First Name</label>
+          <input type="text" id="reg-fname" placeholder="John"/>
+        </div>
+        <div>
+          <label>Last Name</label>
+          <input type="text" id="reg-lname" placeholder="Doe"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@example.com"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="toggle-pw">
+          <input type="password" id="reg-pw" placeholder="Min 8 characters"/>
+          <button class="eye-btn" onclick="togglePw('reg-pw',this)">👁</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Confirm Password</label>
+        <div class="toggle-pw">
+          <input type="password" id="reg-pw2" placeholder="Re-enter password"/>
+          <button class="eye-btn" onclick="togglePw('reg-pw2',this)">👁</button>
+        </div>
+      </div>
+      <div class="error-msg" id="reg-error"></div>
+      <button class="btn btn-primary" onclick="doRegister()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Seed demo users in localStorage
+function initDB() {
+  if (!localStorage.getItem('uv_users')) {
+    const users = [
+      { id:1, fname:'Admin', lname:'User', email:'admin@test.com', pw:'admin123', role:'admin', avatar:'', status:'active', joined: new Date().toISOString() },
+      { id:2, fname:'Jane', lname:'Smith', email:'user@test.com', pw:'user123', role:'user', avatar:'', status:'active', joined: new Date(Date.now()-86400000*5).toISOString() },
+      { id:3, fname:'Ravi', lname:'Kumar', email:'ravi@test.com', pw:'ravi1234', role:'user', avatar:'', status:'active', joined: new Date(Date.now()-86400000*10).toISOString() },
+    ];
+    localStorage.setItem('uv_users', JSON.stringify(users));
+    localStorage.setItem('uv_nextId', '4');
+  }
+}
+initDB();
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (tab==='login'&&i===0)||(tab==='register'&&i===1)));
+  document.getElementById('login-form').classList.toggle('active', tab==='login');
+  document.getElementById('register-form').classList.toggle('active', tab==='register');
+}
+
+function togglePw(id, btn) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+  btn.textContent = el.type === 'password' ? '👁' : '🙈';
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  const users = JSON.parse(localStorage.getItem('uv_users') || '[]');
+  const user = users.find(u => u.email === email && u.pw === pw);
+  if (!user) { errEl.style.display = 'block'; return; }
+  sessionStorage.setItem('uv_session', JSON.stringify({ id: user.id, role: user.role, name: user.fname }));
+  window.location.href = user.role === 'admin' ? 'dashboard.html' : 'profile.html';
+}
+
+function doRegister() {
+  const fname = document.getElementById('reg-fname').value.trim();
+  const lname = document.getElementById('reg-lname').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pw = document.getElementById('reg-pw').value;
+  const pw2 = document.getElementById('reg-pw2').value;
+  const errEl = document.getElementById('reg-error');
+  errEl.style.display = 'none';
+
+  if (!fname||!lname||!email||!pw) { showErr(errEl,'All fields required.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr(errEl,'Invalid email format.'); return; }
+  if (pw.length < 8) { showErr(errEl,'Password must be at least 8 characters.'); return; }
+  if (pw !== pw2) { showErr(errEl,'Passwords do not match.'); return; }
+
+  const users = JSON.parse(localStorage.getItem('uv_users') || '[]');
+  if (users.find(u => u.email === email)) { showErr(errEl,'Email already registered.'); return; }
+
+  const id = parseInt(localStorage.getItem('uv_nextId') || '4');
+  users.push({ id, fname, lname, email, pw, role:'user', avatar:'', status:'active', joined: new Date().toISOString() });
+  localStorage.setItem('uv_users', JSON.stringify(users));
+  localStorage.setItem('uv_nextId', String(id+1));
+  sessionStorage.setItem('uv_session', JSON.stringify({ id, role:'user', name: fname }));
+  window.location.href = 'profile.html';
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+</script>
+</body>
+</html>
